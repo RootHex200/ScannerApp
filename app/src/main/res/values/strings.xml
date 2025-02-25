@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ScannerApp</string>
+    <string name="header_bg_image">header bg image</string>
 </resources>
