@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.scannerapp.R
 import com.example.scannerapp.view.landing.QrGenerator.QRgenerator
+import com.example.scannerapp.view.landing.history.QRhistory
 
 class BottomNavigation : AppCompatActivity() {
     private lateinit var frameLayout: FrameLayout
