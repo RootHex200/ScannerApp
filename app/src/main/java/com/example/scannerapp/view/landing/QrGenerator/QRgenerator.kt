@@ -1,4 +1,4 @@
-package com.example.scannerapp.view.landing
+package com.example.scannerapp.view.landing.QrGenerator
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -7,10 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
-import com.example.scannerapp.view.landing.model.QrOptionItem
+import com.example.scannerapp.view.landing.QrGenerator.adapter.QrGeneratorOptionAdapter
+import com.example.scannerapp.view.landing.QrGenerator.model.QrOptionItem
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -20,7 +20,14 @@ class QRgenerator : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    var tmplist= arrayListOf(QrOptionItem(title = "Text"),QrOptionItem(title = "Web"))
+    var tmplist= arrayListOf(
+        QrOptionItem(title = "Text", image = R.drawable.ic_text) ,
+        QrOptionItem(title = "Web", image = R.drawable.website),
+        QrOptionItem(title = "Business", image = R.drawable.business),
+        QrOptionItem(title = "Wifi", image = R.drawable.wifi),
+        QrOptionItem(title = "Event", image = R.drawable.event),
+        QrOptionItem(title = "Contact", image = R.drawable.contact)
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +48,7 @@ class QRgenerator : Fragment() {
         //initialize ui
         var recyclerView=view.findViewById<RecyclerView>(R.id.generatedOptionList)
         recyclerView.layoutManager = GridLayoutManager(context,3)
-        recyclerView.adapter=QrGeneratorOptionList(tmplist)
+        recyclerView.adapter= QrGeneratorOptionAdapter(tmplist)
         return view
     }
 
