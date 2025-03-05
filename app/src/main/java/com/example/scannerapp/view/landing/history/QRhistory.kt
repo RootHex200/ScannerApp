@@ -51,7 +51,7 @@ class QRhistory : Fragment() {
 
         var scanHistory=view.findViewById<LinearLayout>(R.id.scanHistoryBtn)
         var createHistory=view.findViewById<LinearLayout>(R.id.createHistoryBtn)
-        var scanFragment=view.findViewById<FrameLayout>(R.id.qrHistoryframlayout)
+       // var scanFragment=view.findViewById<FrameLayout>(R.id.qrHistoryframlayout)
         scanHistory.setOnClickListener {
             parentFragmentManager.beginTransaction().replace(
                 R.id.qrHistoryframlayout,ScanHistory()
