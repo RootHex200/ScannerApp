@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
-import com.example.scannerapp.view.landing.history.scanHistory.adapter.ScanHistoryListAdapter
+import com.example.scannerapp.view.landing.history.adapter.ScanHistoryListAdapter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -44,7 +44,7 @@ class ScanHistory : Fragment() {
 
         var recyclerView=view.findViewById<RecyclerView>(R.id.qrScannerList)
         recyclerView.layoutManager=LinearLayoutManager(context)
-        recyclerView.adapter=ScanHistoryListAdapter()
+        recyclerView.adapter= ScanHistoryListAdapter()
 
         return view
     }

@@ -1,4 +1,4 @@
-package com.example.scannerapp.view.landing.history.scanHistory.adapter
+package com.example.scannerapp.view.landing.history.adapter
 
 import android.view.LayoutInflater
 import android.view.View
