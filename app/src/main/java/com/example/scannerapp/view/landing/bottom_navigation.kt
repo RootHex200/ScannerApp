@@ -3,11 +3,14 @@ package com.example.scannerapp.view.landing
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.scannerapp.R
 import com.example.scannerapp.view.landing.QrGenerator.QRgenerator
 import com.example.scannerapp.view.landing.history.QRhistory
+import com.example.scannerapp.view.landing.scanner.QRscanner
+
 
 class BottomNavigation : AppCompatActivity() {
     private lateinit var frameLayout: FrameLayout
@@ -42,7 +45,7 @@ class BottomNavigation : AppCompatActivity() {
         if(fragment==null){
             //Log.d("BottomNavigation.loadFragmentView",fragment!!)
             supportFragmentManager.beginTransaction().replace(
-                R.id.fragment_container,QRscanner()
+                R.id.fragment_container, QRscanner()
             ).commit()
         }else{
             supportFragmentManager.beginTransaction().replace(
