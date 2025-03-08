@@ -60,11 +60,13 @@
             android:layout_width="match_parent"
             android:layout_height="30dp">
             <ImageView
+                android:id="@+id/zoomOut"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_remove"
                 android:layout_width="20dp"
                 android:layout_height="wrap_content"/>
             <SeekBar
+                android:id="@+id/zoomSeekbar"
                 android:progressDrawable="@drawable/seekbar_progressbar"
                 android:thumb="@drawable/thum"
                 android:layout_gravity="center"
@@ -72,6 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"/>
             <ImageView
+                android:id="@+id/zoomIn"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_plus"
                 android:layout_width="wrap_content"

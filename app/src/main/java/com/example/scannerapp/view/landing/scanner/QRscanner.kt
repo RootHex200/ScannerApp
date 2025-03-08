@@ -1,6 +1,7 @@
 package com.example.scannerapp.view.landing.scanner
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -8,8 +9,12 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.ScaleGestureDetector
+import android.view.ScaleGestureDetector.*
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,10 +42,14 @@ class QRscanner : Fragment() {
     private var isScanningEnabled = true // Controls scanning state
     private val handler = Handler(Looper.getMainLooper()) // Handles timeout
     private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var cameraControl: CameraControl
 
     // Define crop area (adjust based on screen size)
     private val cropRectWidth = 500  // Width of crop area in pixels
     private val cropRectHeight = 500 // Height of crop area in pixels
+    private var zoomValue=1;
+    private lateinit var zoomSeekBar:SeekBar
+    @SuppressLint("MissingInflatedId")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,25 +57,43 @@ class QRscanner : Fragment() {
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_q_rscanner, container, false)
         previewView = view.findViewById(R.id.previewCamera)
-       // tvResult = view.findViewById(R.id.takePhoto)
+
+         zoomSeekBar = view.findViewById<SeekBar>(R.id.zoomSeekbar)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-        mediaPlayer = MediaPlayer.create(requireContext(), R.raw.beep) // Load beep sound
+        mediaPlayer = MediaPlayer.create(requireContext(), R.raw.beep)
+
+        zoomSeekBar.max = 100 // CameraX zoom range is from 0 to 1, so map 0-100
+
+        zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) { // Ensure only user interactions update zoom
+                    val zoomRatio = progress / 100f // Convert progress to 0-1 range
+                    cameraControl.setLinearZoom(zoomRatio)
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+
 
         if (allPermissionsGranted()) {
-            startCamera()
+            startCamera(zoomSeekBar)
         } else {
             requestPermissions()
         }
         return view
     }
 
-    private fun startCamera() {
+
+    private fun startCamera(zoomSeekBar: SeekBar) {
         val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
             ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
@@ -89,14 +116,42 @@ class QRscanner : Fragment() {
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
+                val camera = cameraProvider.bindToLifecycle(
                     viewLifecycleOwner, cameraSelector, preview, imageAnalyzer
                 )
+                cameraControl = camera.cameraControl
+
+                // Update SeekBar when zoom changes from pinch gesture
+                camera.cameraInfo.zoomState.observe(viewLifecycleOwner) { zoomState ->
+                    val zoomRatio = zoomState.linearZoom
+                    zoomSeekBar.progress = (zoomRatio * 100).toInt() // Sync SeekBar with pinch zoom
+                }
+
+                setupPinchToZoom()
             } catch (exc: Exception) {
                 Log.e("CameraX", "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
+
+
+    private fun setupPinchToZoom() {
+        val scaleGestureDetector = ScaleGestureDetector(requireContext(),
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    val zoomRatio = detector.scaleFactor.coerceIn(0f, 1f) // Fix scaling range
+                    cameraControl.setLinearZoom(zoomRatio)
+                    return true
+                }
+            })
+
+        previewView.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            true
+        }
+    }
+
 
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
@@ -109,14 +164,12 @@ class QRscanner : Fragment() {
                 .addOnSuccessListener { barcodes ->
                     for (barcode in barcodes) {
                         barcode.boundingBox?.let { box ->
-                            if (isWithinCropArea(box)) { // Check if barcode is within center area
-                                barcode.rawValue?.let { scannedValue ->
-                                    if (scannedValue != lastScannedValue) {
-                                        lastScannedValue = scannedValue
-                                        tvResult.text = scannedValue
-                                        playBeepSound()
-                                        handleSuccessfulScan(scannedValue)
-                                    }
+                            barcode.rawValue?.let { scannedValue ->
+                                if (scannedValue != lastScannedValue) {
+                                    lastScannedValue = scannedValue
+
+                                    playBeepSound()
+                                    handleSuccessfulScan(scannedValue)
                                 }
                             }
                         }
@@ -131,18 +184,6 @@ class QRscanner : Fragment() {
         }
     }
 
-    private fun isWithinCropArea(box: android.graphics.Rect): Boolean {
-        val centerX = previewView.width / 2
-        val centerY = previewView.height / 2
-
-        val cropLeft = centerX - (cropRectWidth / 2)
-        val cropTop = centerY - (cropRectHeight / 2)
-        val cropRight = centerX + (cropRectWidth / 2)
-        val cropBottom = centerY + (cropRectHeight / 2)
-
-        return box.left >= cropLeft && box.right <= cropRight &&
-                box.top >= cropTop && box.bottom <= cropBottom
-    }
 
     private fun playBeepSound() {
         mediaPlayer.start() // Play beep sound
@@ -169,7 +210,7 @@ class QRscanner : Fragment() {
     private val requestPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                startCamera()
+                startCamera(zoomSeekBar)
             } else {
                 Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_LONG).show()
             }
