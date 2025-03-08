@@ -6,4 +6,5 @@
     <color name="primaryColor">#FDB623</color>
     <color name="secondaryColor">#333333</color>
     <color name="secondaryColor2">#1F1F1F</color>
+    <color name="whiteTextOpacityColor">#D9D9D9</color>
 </resources>

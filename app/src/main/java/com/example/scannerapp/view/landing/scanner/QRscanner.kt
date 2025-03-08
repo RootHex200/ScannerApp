@@ -2,6 +2,7 @@ package com.example.scannerapp.view.landing.scanner
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -25,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
 import com.example.scannerapp.R
+import com.example.scannerapp.view.details.DetailsActivity
 import com.google.common.util.concurrent.ListenableFuture
 
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -194,10 +196,10 @@ class QRscanner : Fragment() {
 
         // Delay before returning
         handler.postDelayed({
-
-//            findNavController().previousBackStackEntry?.savedStateHandle?.set("scannedResult", scannedData)
-//            findNavController().popBackStack()
-        }, 2000) // 2 seconds delay
+            var intent=Intent(activity,DetailsActivity::class.java)
+            intent.putExtra("value",scannedData)
+            startActivity(intent)
+        }, 1000) // 2 seconds delay
     }
 
     private fun allPermissionsGranted() =
