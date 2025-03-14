@@ -2,9 +2,11 @@ package com.example.scannerapp.view.landing.scanner
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,21 +22,26 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
+import androidx.annotation.RequiresApi
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.room.Room
 
 import com.example.scannerapp.R
+import com.example.scannerapp.db.AppDatabase
+import com.example.scannerapp.db.QRHistoryInfo
+import com.example.scannerapp.db.QRHistoryType
 import com.example.scannerapp.view.details.DetailsActivity
 import com.google.common.util.concurrent.ListenableFuture
 
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
+import java.time.LocalDateTime
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.time.Duration
-
 class QRscanner : Fragment() {
 
     private lateinit var cameraExecutor: ExecutorService
@@ -51,12 +58,15 @@ class QRscanner : Fragment() {
     private val cropRectHeight = 500 // Height of crop area in pixels
     private var zoomValue=1;
     private lateinit var zoomSeekBar:SeekBar
+    private lateinit var db:AppDatabase
     @SuppressLint("MissingInflatedId")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        db=AppDatabase.getInstance(container!!.context)
+
         val view: View = inflater.inflate(R.layout.fragment_q_rscanner, container, false)
         previewView = view.findViewById(R.id.previewCamera)
 
@@ -155,6 +165,7 @@ class QRscanner : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
@@ -191,10 +202,15 @@ class QRscanner : Fragment() {
         mediaPlayer.start() // Play beep sound
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSuccessfulScan(scannedData: String) {
         isScanningEnabled = false // Disable further scanning
 
-        // Delay before returning
+        //history create
+        var qrHistoryDao=db.qrHistoryDao()
+        qrHistoryDao.insertQRInfo(QRHistoryInfo(historyType = QRHistoryType.SCAN_HISTORY, value = scannedData, type = "normal", createAt = LocalDateTime.now().toString() ))
+
+
         handler.postDelayed({
             var intent=Intent(activity,DetailsActivity::class.java)
             intent.putExtra("value",scannedData)
