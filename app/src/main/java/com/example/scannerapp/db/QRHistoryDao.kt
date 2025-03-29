@@ -8,8 +8,8 @@ import androidx.room.Query
 
 @Dao
 interface QRHistoryDao {
-    @Query("SELECT * FROM qrhistoryinfo WHERE history_type =:qrHistoryType")
-    fun getQRHistoryList(qrHistoryType: String): List<QRHistoryInfo>
+    @Query("SELECT * FROM qrhistoryinfo")
+    fun getQRHistoryList(): List<QRHistoryInfo>
 
     @Insert
     fun insertQRInfo(vararg qrHistoryInfo: QRHistoryInfo)

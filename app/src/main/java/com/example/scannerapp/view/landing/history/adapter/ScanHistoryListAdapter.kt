@@ -1,5 +1,6 @@
 package com.example.scannerapp.view.landing.history.adapter
 
+import android.content.Context
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +10,22 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
-import com.example.scannerapp.db.QRHistoryDao
 import com.example.scannerapp.db.QRHistoryInfo
+import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class ScanHistoryListAdapter(
-    var historyList:List<QRHistoryInfo>,
-    var qrHistoryDao: QRHistoryDao): RecyclerView.Adapter<ScanHistoryListAdapter.ViewHolder>() {
+    var historyList:MutableList<QRHistoryInfo>,
+    var context: Context?,
+    var viewModel: ScanHistoryViewModel
+): RecyclerView.Adapter<ScanHistoryListAdapter.ViewHolder>() {
 
+    fun updateData(newList: List<QRHistoryInfo>) {
+        historyList.clear()  // Clear the old list
+        historyList.addAll(newList)  // Add new data
+        notifyDataSetChanged()  // Notify adapter of changes
+    }
 
     class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
         var text=view.findViewById<TextView>(R.id.linkText)
@@ -48,7 +56,7 @@ class ScanHistoryListAdapter(
         holder.data.setText(historyList[position].value)
 
         holder.deleteBtn.setOnClickListener {
-            qrHistoryDao.delete(historyList[position])
+            viewModel.deleteHistory(historyList[position],context!!)
         }
     }
 }

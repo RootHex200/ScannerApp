@@ -6,10 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
+import com.example.scannerapp.db.AppDatabase
+import com.example.scannerapp.db.QRHistoryInfo
+import com.example.scannerapp.db.QRHistoryType
 import com.example.scannerapp.view.landing.history.adapter.ScanHistoryListAdapter
+import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,7 +30,9 @@ class createHistory : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private val viewModel: ScanHistoryViewModel by viewModels()
+    private lateinit var   recyclerView:RecyclerView
+    private lateinit var adapter: ScanHistoryListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -39,16 +46,22 @@ class createHistory : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         var view:View=inflater.inflate(R.layout.fragment_create_history, container, false)
-
-        var recyclerView=view.findViewById<RecyclerView>(R.id.qrCreateHistoryList)
+        var historyList= mutableListOf<QRHistoryInfo>()
+        recyclerView=view.findViewById<RecyclerView>(R.id.qrCreateHistoryList)
         recyclerView.layoutManager= LinearLayoutManager(context)
-        recyclerView.adapter= ScanHistoryListAdapter()
-
+        adapter= ScanHistoryListAdapter(historyList,requireContext(),viewModel)
+        setLiveListener()
         return view;
     }
-
+    @SuppressLint("CheckResult")
+    private fun setLiveListener() {
+        viewModel.historyList.subscribe { value ->
+            var filterData=value.filter { it.historyType==QRHistoryType.CREATE_HISTORY }
+            adapter.updateData(filterData)
+        }
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of

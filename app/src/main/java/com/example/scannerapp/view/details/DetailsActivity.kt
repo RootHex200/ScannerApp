@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.scannerapp.R
+import com.example.scannerapp.db.AppDatabase
+import com.example.scannerapp.db.QRHistoryType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -30,6 +32,8 @@ class DetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
+        Log.d("DetailsActivity.onCreate","hellow")
+
        val currentdateTime=LocalDateTime.now()
         val scannerValue=intent.getStringExtra("value")
         shareBtn=findViewById<LinearLayout>(R.id.share)
@@ -39,6 +43,7 @@ class DetailsActivity : AppCompatActivity() {
         scanTextvalue=findViewById<TextView>(R.id.value)
 
         //date time format
+
 
             val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
             val dateTime = currentdateTime.format(formatter)
