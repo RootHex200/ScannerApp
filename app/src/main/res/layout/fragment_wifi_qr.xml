@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:orientation="vertical"
+    android:background="@color/secondaryColor2"
+    tools:context=".view.landing.QrGenerator.QrGeneratorOption.WifiQrFragment">
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"/>
+    <TextView
+        android:text="Wifi"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@color/secondaryColor2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textColor="@color/white"
+            android:text="Network Name / SSID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:textColor="@color/white"
+            android:paddingLeft="10dp"
+            android:id="@+id/ssidInput"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textColor="@color/white"
+            android:text="Password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <EditText
+            android:textColor="@color/white"
+            android:paddingLeft="10dp"
+            android:id="@+id/passwordInput"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"/>
+        <LinearLayout
+            android:id="@+id/generateQrButton"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_corner_radius"
+            android:backgroundTint="@color/primaryColor"
+
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:gravity="center"
+                android:textAlignment="center"
+                android:text="Generate QR"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"/>
+
+<!--        qr image view-->
+        <ImageView
+            android:id="@+id/qrImageview"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            android:layout_width="250dp"
+            android:layout_height="250dp"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>
