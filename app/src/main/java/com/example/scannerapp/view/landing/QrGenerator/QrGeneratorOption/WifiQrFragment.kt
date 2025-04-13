@@ -1,5 +1,6 @@
 package com.example.scannerapp.view.landing.QrGenerator.QrGeneratorOption
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidmads.library.qrgenearator.QRGContents
+import androidx.transition.Visibility
 import com.example.scannerapp.R
 import com.example.scannerapp.service.QRGeneratorService
 
@@ -27,7 +29,7 @@ class WifiQrFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var qrImageBitmap:Bitmap
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -47,12 +49,19 @@ class WifiQrFragment : Fragment() {
         var passwordInput=view.findViewById<EditText>(R.id.passwordInput);
         var generateQrButton=view.findViewById<LinearLayout>(R.id.generateQrButton);
         var qrImageview=view.findViewById<ImageView>(R.id.qrImageview);
+        var savePhoto=view.findViewById<LinearLayout>(R.id.saveToGallery);
+
+        savePhoto.visibility=View.GONE
 
         generateQrButton.setOnClickListener {
             Log.d("WifiQrFragment.setOnClickListener","click")
             val getBitmap=QRGeneratorService().generateQR(inputValue = ssidInput.text.toString(), Qrtype = QRGContents.Type.TEXT)
+            qrImageBitmap=getBitmap;
             qrImageview.setImageBitmap(getBitmap);
-
+            savePhoto.visibility=View.VISIBLE
+        }
+        savePhoto.setOnClickListener {
+            QRGeneratorService().saveToGallery(container!!.context,qrImageBitmap)
         }
         return view;
 
