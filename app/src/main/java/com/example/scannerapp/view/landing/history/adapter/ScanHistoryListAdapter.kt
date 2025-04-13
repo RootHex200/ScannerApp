@@ -31,7 +31,7 @@ class ScanHistoryListAdapter(
         var text=view.findViewById<TextView>(R.id.linkText)
         var data=view.findViewById<TextView>(R.id.data)
         var deleteBtn=view.findViewById<ImageView>(R.id.deleteBtn)
-        var dateTimeview=view.findViewById<TextView>(R.id.dateTime)
+        //var dateTimeview=view.findViewById<TextView>(R.id.dateTime)
 
 
     }
@@ -51,8 +51,8 @@ class ScanHistoryListAdapter(
         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
         val formateDate = parse.format(formatter)
 
-        holder.dateTimeview.setText(formateDate)
-        holder.text.setText("Data")
+        //holder.dateTimeview.setText(formateDate)
+        holder.text.setText(historyList[position].type)
         holder.data.setText(historyList[position].value)
 
         holder.deleteBtn.setOnClickListener {

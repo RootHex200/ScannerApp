@@ -45,8 +45,8 @@ class DetailsActivity : AppCompatActivity() {
         //date time format
 
 
-            val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
-            val dateTime = currentdateTime.format(formatter)
+        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
+        val dateTime = currentdateTime.format(formatter)
 
 
         //

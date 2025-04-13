@@ -45,7 +45,7 @@ class BottomNavigation : AppCompatActivity() {
         if(fragment==null){
             //Log.d("BottomNavigation.loadFragmentView",fragment!!)
             supportFragmentManager.beginTransaction().replace(
-                R.id.fragment_container, QRscanner()
+                R.id.fragment_container, QRhistory()
             ).commit()
         }else{
             supportFragmentManager.beginTransaction().replace(

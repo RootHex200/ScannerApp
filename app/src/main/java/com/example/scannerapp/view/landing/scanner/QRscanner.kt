@@ -33,6 +33,7 @@ import com.example.scannerapp.R
 import com.example.scannerapp.db.AppDatabase
 import com.example.scannerapp.db.QRHistoryInfo
 import com.example.scannerapp.db.QRHistoryType
+import com.example.scannerapp.service.QRData
 import com.example.scannerapp.service.QRGeneratorService
 import com.example.scannerapp.view.details.DetailsActivity
 import com.google.common.util.concurrent.ListenableFuture
@@ -188,7 +189,7 @@ class QRscanner : Fragment() {
                                     lastScannedValue = QRGeneratorService().formatBarcode(barcode).formattedData
 
                                     playBeepSound()
-                                    handleSuccessfulScan(QRGeneratorService().formatBarcode(barcode).formattedData)
+                                    handleSuccessfulScan(QRGeneratorService().formatBarcode(barcode))
                                 }
                             }
                         }
@@ -209,17 +210,17 @@ class QRscanner : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun handleSuccessfulScan(scannedData: String) {
+    private fun handleSuccessfulScan(scannedData: QRData) {
         isScanningEnabled = false // Disable further scanning
 
         //history create
         var qrHistoryDao=db.qrHistoryDao()
-        qrHistoryDao.insertQRInfo(QRHistoryInfo(historyType = QRHistoryType.SCAN_HISTORY, value = scannedData, type = "normal", createAt = LocalDateTime.now().toString() ))
+        qrHistoryDao.insertQRInfo(QRHistoryInfo(historyType = QRHistoryType.SCAN_HISTORY, value = scannedData.formattedData, type = scannedData.type, createAt = LocalDateTime.now().toString() ))
 
 
         handler.postDelayed({
             var intent=Intent(activity,DetailsActivity::class.java)
-            intent.putExtra("value",scannedData)
+            intent.putExtra("value",scannedData.formattedData)
             startActivity(intent)
         }, 1000) // 2 seconds delay
     }
