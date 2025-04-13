@@ -33,10 +33,12 @@ import com.example.scannerapp.R
 import com.example.scannerapp.db.AppDatabase
 import com.example.scannerapp.db.QRHistoryInfo
 import com.example.scannerapp.db.QRHistoryType
+import com.example.scannerapp.service.QRGeneratorService
 import com.example.scannerapp.view.details.DetailsActivity
 import com.google.common.util.concurrent.ListenableFuture
 
 import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import java.time.LocalDateTime
 import java.util.concurrent.ExecutorService
@@ -117,7 +119,9 @@ class QRscanner : Fragment() {
                 .also {
                     it.setAnalyzer(cameraExecutor) { imageProxy ->
                         if (isScanningEnabled) {
-                            processImageProxy(imageProxy)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                processImageProxy(imageProxy)
+                            }
                         } else {
                             imageProxy.close()
                         }
@@ -175,14 +179,16 @@ class QRscanner : Fragment() {
 
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
+
                     for (barcode in barcodes) {
                         barcode.boundingBox?.let { box ->
+
                             barcode.rawValue?.let { scannedValue ->
                                 if (scannedValue != lastScannedValue) {
-                                    lastScannedValue = scannedValue
+                                    lastScannedValue = QRGeneratorService().formatBarcode(barcode).formattedData
 
                                     playBeepSound()
-                                    handleSuccessfulScan(scannedValue)
+                                    handleSuccessfulScan(QRGeneratorService().formatBarcode(barcode).formattedData)
                                 }
                             }
                         }
