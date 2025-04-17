@@ -18,13 +18,34 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 
 
-class QRGeneratorService {
+
+class QRGeneratorService:QrServiceRepository {
+
+    private fun getQrType(type:QrType):String{
+        if (type==QrType.SMS){
+            return QRGContents.Type.SMS;
+        }
+        if(type==QrType.EMAIL){
+            return QRGContents.Type.EMAIL;
+        }
+        if(type==QrType.CONTACT){
+            return QRGContents.Type.CONTACT;
+        }
+        if(type==QrType.PHONE){
+            return QRGContents.Type.PHONE;
+        }
+        if(type==QrType.LOCATION){
+            return QRGContents.Type.LOCATION;
+        }
+
+        return QRGContents.Type.TEXT;
+    }
 
 
-    fun generateQR(inputValue:String,Qrtype:String):Bitmap{
+    override fun generateQR(inputValue:String,type:QrType):Bitmap{
+        val qrType=getQrType(type)
 
-        // Initializing the QR Encoder with your value to be encoded, type you required and Dimension
-        val qrgEncoder = QRGEncoder(inputValue, null, Qrtype,200)
+        val qrgEncoder = QRGEncoder(inputValue, null, qrType,200)
         try {
             // Getting QR-Code as Bitmap
             var bitmap = qrgEncoder.bitmap
@@ -36,7 +57,7 @@ class QRGeneratorService {
     }
 
 
-    fun saveToGallery(context: Context, bitmap: Bitmap) {
+    override fun saveToGallery(context: Context, bitmap: Bitmap) {
         val filename = "${System.currentTimeMillis()}.png"
         val write: (OutputStream) -> Boolean = {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
@@ -68,7 +89,7 @@ class QRGeneratorService {
 
 
     //QR data formator service
-    fun formatBarcode(barcode: Barcode): QRData {
+    override fun formatBarcode(barcode: Barcode): QRData {
         return when (barcode.valueType) {
             Barcode.TYPE_WIFI -> formatWifi(barcode)
             Barcode.TYPE_URL -> formatUrl(barcode)
@@ -251,14 +272,3 @@ class QRGeneratorService {
         }
     }
 }
-/**
- * Data class to hold formatted QR code data
- * @param type The type of QR data (e.g., WIFI, URL, TEXT)
- * @param formattedData Human-readable formatted data
- * @param rawData The original raw data from the QR code
- */
-data class QRData(
-    val type: String,
-    val formattedData: String,
-    val rawData: String
-)
