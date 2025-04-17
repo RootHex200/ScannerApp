@@ -10,8 +10,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidmads.library.qrgenearator.QRGContents
-import androidx.transition.Visibility
 import com.example.scannerapp.R
 import com.example.scannerapp.service.QRGeneratorService
 import com.example.scannerapp.service.QrType
@@ -23,10 +21,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [WifiQrFragment.newInstance] factory method to
+ * Use the [TextQrFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class WifiQrFragment : Fragment() {
+class TextQrFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -44,10 +42,9 @@ class WifiQrFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var view:View=inflater.inflate(R.layout.fragment_wifi_qr, container, false);
+        var view:View=inflater.inflate(R.layout.fragment_text_qr, container, false);
 
-        var ssidInput=view.findViewById<EditText>(R.id.ssidInput);
-        var passwordInput=view.findViewById<EditText>(R.id.passwordInput);
+        var textValue=view.findViewById<EditText>(R.id.textInput);
         var generateQrButton=view.findViewById<LinearLayout>(R.id.generateQrButton);
         var qrImageview=view.findViewById<ImageView>(R.id.qrImageview);
         var savePhoto=view.findViewById<LinearLayout>(R.id.saveToGallery);
@@ -55,8 +52,7 @@ class WifiQrFragment : Fragment() {
         savePhoto.visibility=View.GONE
 
         generateQrButton.setOnClickListener {
-            Log.d("WifiQrFragment.setOnClickListener","click")
-            val getBitmap=QRGeneratorService().generateQR(inputValue = ssidInput.text.toString(), type = QrType.TEXT)
+            val getBitmap=QRGeneratorService().generateQR(inputValue =textValue.text.toString() , type = QrType.TEXT)
             qrImageBitmap=getBitmap;
             qrImageview.setImageBitmap(getBitmap);
             savePhoto.visibility=View.VISIBLE
@@ -80,7 +76,7 @@ class WifiQrFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            WifiQrFragment().apply {
+            TextQrFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
