@@ -71,6 +71,8 @@ class QRscanner : Fragment() {
     private lateinit var qrCodeImagePreview:ImageView
     private lateinit var cameraRotation:ImageView
     private var lensFacing = CameraSelector.LENS_FACING_BACK
+    private lateinit var cameraFlash:ImageView
+    private var isTorch=false;
     @SuppressLint("MissingInflatedId", "NewApi")
 
     override fun onCreateView(
@@ -84,6 +86,7 @@ class QRscanner : Fragment() {
         uploadImage=view.findViewById(R.id.uploadImage)
          zoomSeekBar = view.findViewById<SeekBar>(R.id.zoomSeekbar)
         qrCodeImagePreview=view.findViewById<ImageView>(R.id.qrcodePreviewImage)
+        cameraFlash=view.findViewById<ImageView>(R.id.cameraFlash)
         cameraExecutor = Executors.newSingleThreadExecutor()
         mediaPlayer = MediaPlayer.create(requireContext(), R.raw.beep)
         cameraRotation=view.findViewById(R.id.cameraRotate)
@@ -128,7 +131,15 @@ class QRscanner : Fragment() {
             }
             startCamera(zoomSeekBar)
         }
-
+        cameraFlash.setOnClickListener {
+            if(isTorch==false){
+                isTorch=true
+                cameraControl.enableTorch(true)
+            }else{
+                isTorch=false
+                cameraControl.enableTorch(false)
+            }
+        }
         if (allPermissionsGranted()) {
             startCamera(zoomSeekBar)
         } else {
