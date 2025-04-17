@@ -35,12 +35,14 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"/>
             <ImageView
+                android:id="@+id/cameraFlash"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:src="@drawable/flash"
                 android:layout_width="30dp"
                 android:layout_height="30dp"/>
             <ImageView
+                android:id="@+id/cameraRotate"
                 android:layout_gravity="center"
                 android:layout_marginRight="20dp"
                 android:src="@drawable/rotation"

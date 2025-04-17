@@ -69,9 +69,8 @@ class QRscanner : Fragment() {
     private lateinit var zoomSeekBar:SeekBar
     private lateinit var db:AppDatabase
     private lateinit var qrCodeImagePreview:ImageView
-
-
-
+    private lateinit var cameraRotation:ImageView
+    private var lensFacing = CameraSelector.LENS_FACING_BACK
     @SuppressLint("MissingInflatedId", "NewApi")
 
     override fun onCreateView(
@@ -87,7 +86,7 @@ class QRscanner : Fragment() {
         qrCodeImagePreview=view.findViewById<ImageView>(R.id.qrcodePreviewImage)
         cameraExecutor = Executors.newSingleThreadExecutor()
         mediaPlayer = MediaPlayer.create(requireContext(), R.raw.beep)
-
+        cameraRotation=view.findViewById(R.id.cameraRotate)
         zoomSeekBar.max = 100 // CameraX zoom range is from 0 to 1, so map 0-100
 
         zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -118,6 +117,16 @@ class QRscanner : Fragment() {
 
             pickImageLauncher.launch(galleryIntent)
             //pickImageLauncher.launch("image/*")
+        }
+
+
+        cameraRotation.setOnClickListener {
+            lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
+                CameraSelector.LENS_FACING_FRONT
+            } else {
+                CameraSelector.LENS_FACING_BACK
+            }
+            startCamera(zoomSeekBar)
         }
 
         if (allPermissionsGranted()) {
@@ -190,8 +199,10 @@ class QRscanner : Fragment() {
                     }
                 }
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
+            //val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build()
             try {
                 cameraProvider.unbindAll()
                 val camera = cameraProvider.bindToLifecycle(
