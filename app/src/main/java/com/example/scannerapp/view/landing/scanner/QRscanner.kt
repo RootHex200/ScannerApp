@@ -5,7 +5,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.media.Image
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -20,12 +24,14 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.room.Room
 
@@ -55,14 +61,18 @@ class QRscanner : Fragment() {
     private val handler = Handler(Looper.getMainLooper()) // Handles timeout
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var cameraControl: CameraControl
-
+    private lateinit var uploadImage:ImageView
     // Define crop area (adjust based on screen size)
     private val cropRectWidth = 500  // Width of crop area in pixels
     private val cropRectHeight = 500 // Height of crop area in pixels
     private var zoomValue=1;
     private lateinit var zoomSeekBar:SeekBar
     private lateinit var db:AppDatabase
-    @SuppressLint("MissingInflatedId")
+    private lateinit var qrCodeImagePreview:ImageView
+
+
+
+    @SuppressLint("MissingInflatedId", "NewApi")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,9 +82,9 @@ class QRscanner : Fragment() {
 
         val view: View = inflater.inflate(R.layout.fragment_q_rscanner, container, false)
         previewView = view.findViewById(R.id.previewCamera)
-
+        uploadImage=view.findViewById(R.id.uploadImage)
          zoomSeekBar = view.findViewById<SeekBar>(R.id.zoomSeekbar)
-
+        qrCodeImagePreview=view.findViewById<ImageView>(R.id.qrcodePreviewImage)
         cameraExecutor = Executors.newSingleThreadExecutor()
         mediaPlayer = MediaPlayer.create(requireContext(), R.raw.beep)
 
@@ -91,7 +101,24 @@ class QRscanner : Fragment() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+         var pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val imageUri=result.data!!.data
+             var bitmap=uriToBitmap(imageUri!!)
+             qrCodeImagePreview.setImageBitmap(bitmap)
+             if (bitmap != null) {
+                 scanQRCodeFromBitmap(bitmap)
+             }
+        }
 
+        uploadImage.setOnClickListener {
+            val galleryIntent = Intent(Intent.ACTION_PICK)
+            // here item is type of image
+            galleryIntent.type = "image/*"
+            // ActivityResultLauncher callback
+
+            pickImageLauncher.launch(galleryIntent)
+            //pickImageLauncher.launch("image/*")
+        }
 
         if (allPermissionsGranted()) {
             startCamera(zoomSeekBar)
@@ -101,6 +128,40 @@ class QRscanner : Fragment() {
         return view
     }
 
+
+    private fun uriToBitmap(uri: Uri): Bitmap? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val drawable = Drawable.createFromStream(inputStream, uri.toString())
+            drawable?.toBitmap()
+        } catch (e: Exception) {
+            Log.e("QRScanner", "Error converting URI to Bitmap", e)
+            null
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun scanQRCodeFromBitmap(bitmap: Bitmap) {
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val scanner = BarcodeScanning.getClient()
+
+        scanner.process(image)
+            .addOnSuccessListener { barcodes ->
+                for (barcode in barcodes) {
+                    barcode.rawValue?.let { scannedValue ->
+                        if (scannedValue != lastScannedValue) {
+                            lastScannedValue = QRGeneratorService().formatBarcode(barcode).formattedData
+                            playBeepSound()
+                            handleSuccessfulScan(QRGeneratorService().formatBarcode(barcode))
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Log.e("QRScanner", "Failed to scan from image", it)
+                Toast.makeText(requireContext(), "Failed to scan QR code from image", Toast.LENGTH_SHORT).show()
+            }
+    }
 
     private fun startCamera(zoomSeekBar: SeekBar) {
         val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =

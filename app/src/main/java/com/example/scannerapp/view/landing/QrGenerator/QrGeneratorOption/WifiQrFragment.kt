@@ -14,6 +14,7 @@ import androidmads.library.qrgenearator.QRGContents
 import androidx.transition.Visibility
 import com.example.scannerapp.R
 import com.example.scannerapp.service.QRGeneratorService
+import com.example.scannerapp.service.QrType
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -55,7 +56,7 @@ class WifiQrFragment : Fragment() {
 
         generateQrButton.setOnClickListener {
             Log.d("WifiQrFragment.setOnClickListener","click")
-            val getBitmap=QRGeneratorService().generateQR(inputValue = ssidInput.text.toString(), Qrtype = QRGContents.Type.TEXT)
+            val getBitmap=QRGeneratorService().generateQR(inputValue = ssidInput.text.toString(), type = QrType.TEXT)
             qrImageBitmap=getBitmap;
             qrImageview.setImageBitmap(getBitmap);
             savePhoto.visibility=View.VISIBLE

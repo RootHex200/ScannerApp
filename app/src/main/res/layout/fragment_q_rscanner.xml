@@ -28,6 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp">
             <ImageView
+                android:id="@+id/uploadImage"
                 android:layout_gravity="center"
                android:layout_marginLeft="20dp"
                 android:src="@drawable/gallery"
@@ -47,6 +48,7 @@
                 android:layout_height="30dp"/>
         </LinearLayout>
         <ImageView
+            android:id="@+id/qrcodePreviewImage"
             android:layout_centerInParent="true"
             android:src="@drawable/qr_camera"
             android:layout_width="250dp"
