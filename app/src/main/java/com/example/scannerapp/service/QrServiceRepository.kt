@@ -7,7 +7,7 @@ import com.google.mlkit.vision.barcode.common.Barcode
 interface QrServiceRepository {
     // This method for generate QR code
     // [generateQR] function will return `Bitmap` of qr code image
-    fun generateQR(inputValue:String,type:QrType):Bitmap
+    fun generateQR(inputValue:String,type:String):Bitmap
 
     //This method used for qr code data formator
     // [formatBarcode] function will return `QRData` object

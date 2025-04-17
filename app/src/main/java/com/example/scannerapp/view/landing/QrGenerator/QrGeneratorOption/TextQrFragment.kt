@@ -2,17 +2,18 @@ package com.example.scannerapp.view.landing.QrGenerator.QrGeneratorOption
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.example.scannerapp.R
 import com.example.scannerapp.service.QRGeneratorService
 import com.example.scannerapp.service.QrType
+import org.w3c.dom.Text
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +25,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [TextQrFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class TextQrFragment : Fragment() {
+class TextQrFragment() : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -41,6 +42,9 @@ class TextQrFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        val bundle = arguments
+        val qrtype = bundle!!.getString("value")
         // Inflate the layout for this fragment
         var view:View=inflater.inflate(R.layout.fragment_text_qr, container, false);
 
@@ -48,11 +52,13 @@ class TextQrFragment : Fragment() {
         var generateQrButton=view.findViewById<LinearLayout>(R.id.generateQrButton);
         var qrImageview=view.findViewById<ImageView>(R.id.qrImageview);
         var savePhoto=view.findViewById<LinearLayout>(R.id.saveToGallery);
-
+        var pageTitles=view.findViewById<TextView>(R.id.pageTitle);
+        var inputName=view.findViewById<TextView>(R.id.inputName);
         savePhoto.visibility=View.GONE
-
+        pageTitles.setText(qrtype)
+        inputName.setText("${qrtype?.lowercase()?.capitalize()} Input")
         generateQrButton.setOnClickListener {
-            val getBitmap=QRGeneratorService().generateQR(inputValue =textValue.text.toString() , type = QrType.TEXT)
+            val getBitmap=QRGeneratorService().generateQR(inputValue =textValue.text.trim().toString() , type = qrtype!!)
             qrImageBitmap=getBitmap;
             qrImageview.setImageBitmap(getBitmap);
             savePhoto.visibility=View.VISIBLE
@@ -76,7 +82,7 @@ class TextQrFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            TextQrFragment().apply {
+            TextQrFragment( ).apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

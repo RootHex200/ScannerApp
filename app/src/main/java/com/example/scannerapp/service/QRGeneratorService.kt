@@ -18,23 +18,22 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 
 
-
 class QRGeneratorService:QrServiceRepository {
 
-    private fun getQrType(type:QrType):String{
-        if (type==QrType.SMS){
+    private fun getQrType(type:String):String{
+        if (type==QrType.SMS.toString()){
             return QRGContents.Type.SMS;
         }
-        if(type==QrType.EMAIL){
+        if(type==QrType.EMAIL.toString()){
             return QRGContents.Type.EMAIL;
         }
-        if(type==QrType.CONTACT){
+        if(type==QrType.CONTACT.toString()){
             return QRGContents.Type.CONTACT;
         }
-        if(type==QrType.PHONE){
+        if(type==QrType.PHONE.toString()){
             return QRGContents.Type.PHONE;
         }
-        if(type==QrType.LOCATION){
+        if(type==QrType.LOCATION.toString()){
             return QRGContents.Type.LOCATION;
         }
 
@@ -42,7 +41,7 @@ class QRGeneratorService:QrServiceRepository {
     }
 
 
-    override fun generateQR(inputValue:String,type:QrType):Bitmap{
+    override fun generateQR(inputValue:String,type:String):Bitmap{
         val qrType=getQrType(type)
 
         val qrgEncoder = QRGEncoder(inputValue, null, qrType,200)

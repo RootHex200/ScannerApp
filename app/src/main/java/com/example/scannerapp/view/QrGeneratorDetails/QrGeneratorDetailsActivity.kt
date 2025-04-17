@@ -6,8 +6,8 @@ import android.util.Log
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.example.scannerapp.R
+import com.example.scannerapp.service.QrType
 import com.example.scannerapp.view.landing.QrGenerator.QrGeneratorOption.TextQrFragment
-import com.example.scannerapp.view.landing.QrGenerator.model.QrOptionType
 
 class QrGeneratorDetailsActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -23,13 +23,21 @@ class QrGeneratorDetailsActivity : AppCompatActivity() {
 
     fun changeLayoutByValue(value:String){
         Log.d("QrGeneratorDetailsActivity.changeLayoutByValue",value)
-        if (value==QrOptionType.Wifi.name){
+        var fragment=TextQrFragment()
+        val mBundle = Bundle()
+        mBundle.putString(
+            "value",
+            value
+        )
+        fragment.setArguments(mBundle)
+        if(value==QrType.TEXT.name || value==QrType.PHONE.name ||
+            value==QrType.SMS.name || value==QrType.EMAIL.name ||
+            value==QrType.LOCATION.name){
             supportFragmentManager.beginTransaction().replace(
-                R.id.detailsFrameLayout,TextQrFragment()
-            ).commit()
-        }
-        if(value==QrOptionType.Web.name){
+                R.id.detailsFrameLayout,
+                fragment
 
+            ).commit()
         }
     }
 }

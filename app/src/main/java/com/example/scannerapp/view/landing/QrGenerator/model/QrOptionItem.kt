@@ -1,17 +1,9 @@
 package com.example.scannerapp.view.landing.QrGenerator.model
 
+import com.example.scannerapp.service.QrType
+
 data class QrOptionItem(
     var title:String,
     var image:Int,
-    var QrOptionType:QrOptionType
+    var qrOptionType:QrType
 )
-
-
-enum class QrOptionType{
-    Wifi,
-    Web,
-    Business,
-    Text,
-    Event,
-    Contact
-}

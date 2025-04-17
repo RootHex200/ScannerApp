@@ -37,7 +37,7 @@ class QrGeneratorOptionAdapter(private var data:List<QrOptionItem>) : RecyclerVi
         holder.btn.setOnClickListener {
             Log.d("QrGeneratorOptionAdapter.setOnClickListener","btn")
             var intent=Intent(context,QrGeneratorDetailsActivity::class.java)
-            intent.putExtra("qrType",data[position].QrOptionType.name)
+            intent.putExtra("qrType",data[position].qrOptionType.name)
             startActivity(context,intent,null)
         }
     }

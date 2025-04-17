@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
+import com.example.scannerapp.service.QrType
 import com.example.scannerapp.view.landing.QrGenerator.adapter.QrGeneratorOptionAdapter
 import com.example.scannerapp.view.landing.QrGenerator.model.QrOptionItem
-import com.example.scannerapp.view.landing.QrGenerator.model.QrOptionType
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -22,12 +22,8 @@ class QRgenerator : Fragment() {
     private var param2: String? = null
 
     var tmplist= arrayListOf(
-        QrOptionItem(title = "Text", image = R.drawable.ic_text, QrOptionType = QrOptionType.Wifi)
-//        QrOptionItem(title = "Web", image = R.drawable.website),
-//        QrOptionItem(title = "Business", image = R.drawable.business),
-//        QrOptionItem(title = "Wifi", image = R.drawable.wifi),
-//        QrOptionItem(title = "Event", image = R.drawable.event),
-//        QrOptionItem(title = "Contact", image = R.drawable.contact)
+        QrOptionItem(title = "Text", image = R.drawable.ic_text, qrOptionType = QrType.TEXT),
+        QrOptionItem(title = "Phone", image = R.drawable.ic_phone, qrOptionType = QrType.PHONE)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
