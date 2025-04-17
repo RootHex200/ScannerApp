@@ -23,7 +23,10 @@ class QRgenerator : Fragment() {
 
     var tmplist= arrayListOf(
         QrOptionItem(title = "Text", image = R.drawable.ic_text, qrOptionType = QrType.TEXT),
-        QrOptionItem(title = "Phone", image = R.drawable.ic_phone, qrOptionType = QrType.PHONE)
+        QrOptionItem(title = "Phone", image = R.drawable.ic_phone, qrOptionType = QrType.PHONE),
+        QrOptionItem(title = "SMS", image = R.drawable.ic_sms, qrOptionType = QrType.SMS),
+        QrOptionItem(title = "Email", image = R.drawable.ic_email, qrOptionType = QrType.EMAIL),
+        QrOptionItem(title = "Contact", image = R.drawable.ic_contact, qrOptionType = QrType.CONTACT),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

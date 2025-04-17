@@ -32,7 +32,7 @@ class QrGeneratorDetailsActivity : AppCompatActivity() {
         fragment.setArguments(mBundle)
         if(value==QrType.TEXT.name || value==QrType.PHONE.name ||
             value==QrType.SMS.name || value==QrType.EMAIL.name ||
-            value==QrType.LOCATION.name){
+            value==QrType.LOCATION.name || value==QrType.CONTACT.name){
             supportFragmentManager.beginTransaction().replace(
                 R.id.detailsFrameLayout,
                 fragment
