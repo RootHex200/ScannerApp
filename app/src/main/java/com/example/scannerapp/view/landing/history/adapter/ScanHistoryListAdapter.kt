@@ -3,6 +3,7 @@ package com.example.scannerapp.view.landing.history.adapter
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,8 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
 import com.example.scannerapp.db.QRHistoryInfo
+import com.example.scannerapp.db.QRHistoryType
+import com.example.scannerapp.service.QrType
 import com.example.scannerapp.view.details.DetailsActivity
 import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
 import java.time.LocalDateTime
@@ -62,7 +65,10 @@ class ScanHistoryListAdapter(
             var intent=Intent(context,DetailsActivity::class.java)
             intent.putExtra("value",historyList[position].value)
             intent.putExtra("datetime",historyList[position].createAt)
-            intent.putExtra("detailsType","scanHistoryDetails")
+            intent.putExtra("type",historyList[position].type)
+            if(historyList[position].historyType.toString()==QRHistoryType.CREATE_HISTORY.toString()){
+                intent.putExtra("detailsType","createHistory")
+            }
             context!!.startActivity(intent)
 
         }

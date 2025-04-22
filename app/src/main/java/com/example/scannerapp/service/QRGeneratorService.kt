@@ -43,7 +43,7 @@ class QRGeneratorService:QrServiceRepository {
 
     override fun generateQR(inputValue:String,type:String):Bitmap{
         val qrType=getQrType(type)
-
+        Log.d("detailsType",qrType)
         val qrgEncoder = QRGEncoder(inputValue, null, qrType,200)
         try {
             // Getting QR-Code as Bitmap
