@@ -305,6 +305,7 @@ class QRscanner : Fragment() {
             var intent=Intent(activity,DetailsActivity::class.java)
             intent.putExtra("value",scannedData.formattedData)
             startActivity(intent)
+            qrCodeImagePreview.setImageResource(R.drawable.qr_camera)
         }, 1000) // 2 seconds delay
     }
 
