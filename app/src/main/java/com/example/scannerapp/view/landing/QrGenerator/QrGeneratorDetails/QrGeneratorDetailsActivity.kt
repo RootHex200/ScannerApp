@@ -1,4 +1,4 @@
-package com.example.scannerapp.view.QrGeneratorDetails
+package com.example.scannerapp.view.landing.QrGenerator.QrGeneratorDetails
 
 import android.annotation.SuppressLint
 import android.os.Bundle

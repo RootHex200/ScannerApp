@@ -1,6 +1,7 @@
 package com.example.scannerapp.view.landing.QrGenerator.QrGeneratorOption
 
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +10,16 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.example.scannerapp.R
+import com.example.scannerapp.db.AppDatabase
+import com.example.scannerapp.db.QRHistoryInfo
+import com.example.scannerapp.db.QRHistoryType
 import com.example.scannerapp.service.QRGeneratorService
 import com.example.scannerapp.service.QrType
 import org.w3c.dom.Text
+import java.time.LocalDateTime
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,6 +44,7 @@ class TextQrFragment() : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,6 +69,16 @@ class TextQrFragment() : Fragment() {
             qrImageBitmap=getBitmap;
             qrImageview.setImageBitmap(getBitmap);
             savePhoto.visibility=View.VISIBLE
+
+
+            //store in db
+            AppDatabase.getInstance(container!!.context).qrHistoryDao().insertQRInfo(
+                QRHistoryInfo(
+                type = qrtype,
+                value = textValue.text.trim().toString(),
+                createAt = LocalDateTime.now().toString(),
+                historyType = QRHistoryType.CREATE_HISTORY
+            ))
         }
         savePhoto.setOnClickListener {
             QRGeneratorService().saveToGallery(container!!.context,qrImageBitmap)

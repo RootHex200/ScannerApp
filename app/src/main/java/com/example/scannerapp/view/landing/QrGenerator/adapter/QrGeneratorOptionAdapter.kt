@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
-import com.example.scannerapp.view.QrGeneratorDetails.QrGeneratorDetailsActivity
+import com.example.scannerapp.view.landing.QrGenerator.QrGeneratorDetails.QrGeneratorDetailsActivity
 import com.example.scannerapp.view.landing.QrGenerator.model.QrOptionItem
 import com.example.scannerapp.view.landing.history.scanHistory.ScanHistory
 
@@ -36,7 +36,7 @@ class QrGeneratorOptionAdapter(private var data:List<QrOptionItem>) : RecyclerVi
         holder.image.setImageResource(data[position].image)
         holder.btn.setOnClickListener {
             Log.d("QrGeneratorOptionAdapter.setOnClickListener","btn")
-            var intent=Intent(context,QrGeneratorDetailsActivity::class.java)
+            var intent=Intent(context, QrGeneratorDetailsActivity::class.java)
             intent.putExtra("qrType",data[position].qrOptionType.name)
             startActivity(context,intent,null)
         }

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.QrGeneratorDetails.QrGeneratorDetailsActivity">
+    tools:context=".view.landing.QrGenerator.QrGeneratorDetails.QrGeneratorDetailsActivity">
     <FrameLayout
         android:id="@+id/detailsFrameLayout"
         android:layout_width="match_parent"

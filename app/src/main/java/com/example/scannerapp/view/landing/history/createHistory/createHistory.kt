@@ -2,6 +2,7 @@ package com.example.scannerapp.view.landing.history.createHistory
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -46,19 +47,22 @@ class createHistory : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        context?.let { viewModel.getHistory(it) }
 
         var view:View=inflater.inflate(R.layout.fragment_create_history, container, false)
         var historyList= mutableListOf<QRHistoryInfo>()
         recyclerView=view.findViewById<RecyclerView>(R.id.qrCreateHistoryList)
         recyclerView.layoutManager= LinearLayoutManager(context)
         adapter= ScanHistoryListAdapter(historyList,requireContext(),viewModel)
+        recyclerView.adapter = adapter
         setLiveListener()
         return view;
     }
     @SuppressLint("CheckResult")
     private fun setLiveListener() {
         viewModel.historyList.subscribe { value ->
-            var filterData=value.filter { it.historyType==QRHistoryType.CREATE_HISTORY }
+            var filterData=value.filter {
+                it.historyType==QRHistoryType.CREATE_HISTORY }
             adapter.updateData(filterData)
         }
     }
