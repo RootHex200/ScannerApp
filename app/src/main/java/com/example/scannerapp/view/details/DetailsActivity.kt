@@ -32,10 +32,11 @@ class DetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
-        Log.d("DetailsActivity.onCreate","hellow")
-
-       val currentdateTime=LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
+        val currentdateTime=LocalDateTime.now()
         val scannerValue=intent.getStringExtra("value")
+        val scannerDateTime=intent.getStringExtra("datetime")
+        var detailsType=intent.getStringExtra("detailsType")
         shareBtn=findViewById<LinearLayout>(R.id.share)
         copyBtn=findViewById<LinearLayout>(R.id.copy)
         datetimetext=findViewById<TextView>(R.id.dateTimevalue)
@@ -43,15 +44,17 @@ class DetailsActivity : AppCompatActivity() {
         scanTextvalue=findViewById<TextView>(R.id.value)
 
         //date time format
+        if(scannerDateTime==null){
+            val dateTime = currentdateTime.format(formatter)
+            datetimetext.setText("${dateTime}")
+        }else{
+            var formatTime=LocalDateTime.parse(scannerDateTime).format(formatter)
+            datetimetext.setText("${formatTime}")
 
+        }
 
-        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
-        val dateTime = currentdateTime.format(formatter)
-
-
-        //
         scanTextvalue.setText(scannerValue)
-        datetimetext.setText("${dateTime}")
+
 
 
 

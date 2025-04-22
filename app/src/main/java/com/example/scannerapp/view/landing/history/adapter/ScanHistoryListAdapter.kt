@@ -1,6 +1,7 @@
 package com.example.scannerapp.view.landing.history.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
 import com.example.scannerapp.db.QRHistoryInfo
+import com.example.scannerapp.view.details.DetailsActivity
 import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -32,6 +34,7 @@ class ScanHistoryListAdapter(
         var data=view.findViewById<TextView>(R.id.data)
         var deleteBtn=view.findViewById<ImageView>(R.id.deleteBtn)
         //var dateTimeview=view.findViewById<TextView>(R.id.dateTime)
+        var layout=view.findViewById<View>(R.id.historyItem)
 
 
     }
@@ -47,16 +50,21 @@ class ScanHistoryListAdapter(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var parse=LocalDateTime.parse(historyList[position].createAt)
-        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
-        val formateDate = parse.format(formatter)
 
-        //holder.dateTimeview.setText(formateDate)
         holder.text.setText(historyList[position].type)
         holder.data.setText(historyList[position].value)
 
         holder.deleteBtn.setOnClickListener {
             viewModel.deleteHistory(historyList[position],context!!)
+        }
+
+        holder.layout.setOnClickListener {
+            var intent=Intent(context,DetailsActivity::class.java)
+            intent.putExtra("value",historyList[position].value)
+            intent.putExtra("datetime",historyList[position].createAt)
+            intent.putExtra("detailsType","scanHistoryDetails")
+            context!!.startActivity(intent)
+
         }
     }
 }
