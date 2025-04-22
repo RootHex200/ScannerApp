@@ -13,7 +13,7 @@
     android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/qrImageView"
-        android:layout_weight="1"
+        android:layout_marginRight="15dp"
         android:layout_gravity="center"
 
         android:src="@drawable/qr_image"
