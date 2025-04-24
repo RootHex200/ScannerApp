@@ -38,6 +38,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
+            implementation("network.chaintech:qr-kit:2.0.0")
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
