@@ -7,6 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +37,8 @@ class createHistory : Fragment() {
     private val viewModel: ScanHistoryViewModel by viewModels()
     private lateinit var   recyclerView:RecyclerView
     private lateinit var adapter: ScanHistoryListAdapter
+    private lateinit var progressBar:ProgressBar
+    private lateinit var emptyView:LinearLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -52,9 +57,16 @@ class createHistory : Fragment() {
         var view:View=inflater.inflate(R.layout.fragment_create_history, container, false)
         var historyList= mutableListOf<QRHistoryInfo>()
         recyclerView=view.findViewById<RecyclerView>(R.id.qrCreateHistoryList)
+        progressBar=view.findViewById<ProgressBar>(R.id.progressBar)
+        emptyView=view.findViewById<LinearLayout>(R.id.emptyView)
         recyclerView.layoutManager= LinearLayoutManager(context)
         adapter= ScanHistoryListAdapter(historyList,requireContext(),viewModel)
         recyclerView.adapter = adapter
+
+        recyclerView.visibility=View.GONE
+        emptyView.visibility=View.GONE
+
+        progressBar.visibility=View.VISIBLE
         setLiveListener()
         return view;
     }
@@ -63,7 +75,17 @@ class createHistory : Fragment() {
         viewModel.historyList.subscribe { value ->
             var filterData=value.filter {
                 it.historyType==QRHistoryType.CREATE_HISTORY }
-            adapter.updateData(filterData)
+            if(filterData.size<=0){
+                progressBar.visibility=View.GONE;
+                recyclerView.visibility=View.GONE;
+                emptyView.visibility=View.VISIBLE;
+            }else{
+                progressBar.visibility=View.GONE
+                emptyView.visibility=View.GONE;
+                recyclerView.visibility=View.VISIBLE;
+                adapter.updateData(filterData)
+            }
+
         }
     }
     companion object {

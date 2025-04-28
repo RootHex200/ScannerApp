@@ -7,6 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +18,8 @@ import com.example.scannerapp.db.QRHistoryInfo
 import com.example.scannerapp.db.QRHistoryType
 import com.example.scannerapp.view.landing.history.adapter.ScanHistoryListAdapter
 import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,6 +38,8 @@ class ScanHistory : Fragment() {
     private val viewModel: ScanHistoryViewModel by viewModels()
     private lateinit var   recyclerView:RecyclerView
     private lateinit var adapter: ScanHistoryListAdapter
+    private lateinit var progressBar: ProgressBar
+    private lateinit var emptyView: LinearLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -52,11 +59,19 @@ class ScanHistory : Fragment() {
         var view:View=inflater.inflate(R.layout.fragment_scan_history, container, false)
         var historyList= mutableListOf<QRHistoryInfo>()
         recyclerView=view.findViewById<RecyclerView>(R.id.qrScannerList)
+        progressBar=view.findViewById<ProgressBar>(R.id.progressBar)
+        emptyView=view.findViewById<LinearLayout>(R.id.emptyView)
         recyclerView.layoutManager=LinearLayoutManager(context)
         adapter = ScanHistoryListAdapter(historyList, requireContext(),viewModel)
         recyclerView.adapter = adapter
 
+        recyclerView.visibility=View.GONE
+        emptyView.visibility=View.GONE
+
+        progressBar.visibility=View.VISIBLE
+
         setLiveListener()
+
 
         return view
     }
@@ -67,7 +82,17 @@ class ScanHistory : Fragment() {
 
 
             var filterData=value.filter { it.historyType==QRHistoryType.SCAN_HISTORY }
-            adapter.updateData(filterData)
+            if(filterData.size<=0){
+                progressBar.visibility=View.GONE;
+                recyclerView.visibility=View.GONE;
+                emptyView.visibility=View.VISIBLE;
+            }else{
+                progressBar.visibility=View.GONE
+                emptyView.visibility=View.GONE;
+                recyclerView.visibility=View.VISIBLE;
+                adapter.updateData(filterData)
+            }
+
         }
     }
 
