@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.room.util.copy
 import com.example.scannerapp.R
 import com.example.scannerapp.db.AppDatabase
 import com.example.scannerapp.db.QRHistoryType
@@ -30,7 +31,6 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var shareBtn:LinearLayout
     private lateinit var copyBtn:LinearLayout
     private lateinit var datetimetext:TextView
-
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +39,9 @@ class DetailsActivity : AppCompatActivity() {
         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
         val currentdateTime=LocalDateTime.now()
         val scannerValue=intent.getStringExtra("value")
+        Log.d("value",scannerValue.toString())
+
+
         var title=findViewById<TextView>(R.id.qrTypeTitle)
         var qrtype=intent.getStringExtra("type")
         val scannerDateTime=intent.getStringExtra("datetime")
@@ -47,6 +50,8 @@ class DetailsActivity : AppCompatActivity() {
         var saveqrBtn=findViewById<LinearLayout>(R.id.saveToGallery)
         var qrImage=findViewById<ImageView>(R.id.qrImageview)
         var qrImageViewLayout=findViewById<LinearLayout>(R.id.qrImageViewLayout)
+        copyBtn=findViewById<LinearLayout>(R.id.copy)
+        shareBtn=findViewById<LinearLayout>(R.id.share)
         var bitmap:Bitmap?=null
         if(detailsType==null){
             qrImageViewLayout.visibility=LinearLayout.INVISIBLE
@@ -76,8 +81,29 @@ class DetailsActivity : AppCompatActivity() {
 
         scanTextvalue.setText(scannerValue)
 
+        copyText(scannerValue!!)
+        share()
 
 
+    }
 
+    fun copyText(value:String){
+        copyBtn.setOnClickListener {
+            val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clipData = android.content.ClipData.newPlainText("text", value)
+            clipboardManager.setPrimaryClip(clipData)
+        }
+
+    }
+
+    fun share(){
+        shareBtn.setOnClickListener {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, scanTextvalue.text)
+                type = "text/plain"
+            }
+            startActivity(sendIntent)
+        }
     }
 }
