@@ -7,20 +7,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="148dp">
+        android:layout_height="105dp">
 
         <RelativeLayout
             android:backgroundTint="@color/secondaryColor2"
             android:background="@drawable/border_bg"
             android:layout_centerInParent="true"
             android:layout_alignParentBottom="true"
-            android:layout_width="140dp"
-            android:layout_height="130dp">
+            android:layout_width="90dp"
+            android:layout_height="90dp">
             <ImageView
                 android:layout_centerInParent="true"
                 android:id="@+id/itemImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
 
                 android:src="@drawable/ic_text" />
         </RelativeLayout>
@@ -30,8 +30,8 @@
             android:background="@drawable/button_corner_radius"
             android:backgroundTint="@color/primaryColor"
             android:layout_width="wrap_content"
-            android:paddingHorizontal="15dp"
-            android:paddingVertical="10dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="8dp"
 
             android:layout_height="wrap_content">
             <TextView
@@ -39,6 +39,7 @@
                 android:text="Telephone"
                 android:textStyle="bold"
                 android:textColor="@color/black"
+                android:textSize="14sp"
                 android:textAlignment="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

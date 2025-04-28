@@ -6,23 +6,26 @@
     android:orientation="vertical"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
+    android:fitsSystemWindows="true"
     android:background="@color/secondaryColor"
     tools:context=".view.landing.QrGenerator.QRgenerator">
 
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="20dp"/>
+        android:layout_height="25dp"/>
     <TextView
         android:text="Generate Qr"
         android:textColor="@color/white"
         android:textSize="22sp"
+        android:layout_marginLeft="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <Space
         android:layout_width="match_parent"
         android:layout_height="20dp"/>
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginLeft="20dp"
         android:id="@+id/generatedOptionList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
