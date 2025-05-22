@@ -10,8 +10,9 @@ import com.example.scannerapp.R
 import com.example.scannerapp.view.landing.QrGenerator.QRgenerator
 import com.example.scannerapp.view.landing.history.QRhistory
 import com.example.scannerapp.view.landing.scanner.QRscanner
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class BottomNavigation : AppCompatActivity() {
     private lateinit var frameLayout: FrameLayout
     private lateinit var qrHistory:ImageView

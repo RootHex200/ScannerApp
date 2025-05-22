@@ -3,31 +3,36 @@ package com.example.scannerapp.view.landing.history.viewmodel
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.scannerapp.db.AppDatabase
-import com.example.scannerapp.db.QRHistoryInfo
-import com.example.scannerapp.db.QRHistoryType
+import com.example.scannerapp.core.base.BaseViewModel
+import com.example.scannerapp.core.db.AppDatabase
+import com.example.scannerapp.domain.model.QrCode
+import com.example.scannerapp.domain.repositories.QrCodeRepositories
 import com.google.android.material.search.SearchView.Behavior
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.subjects.BehaviorSubject
+import javax.inject.Inject
 
-class ScanHistoryViewModel: ViewModel() {
+@HiltViewModel
+class ScanHistoryViewModel @Inject constructor(
+    private val repository: QrCodeRepositories
+): BaseViewModel() {
 
-    val historyList = BehaviorSubject.create<List<QRHistoryInfo>>()
+    val scannedList = BehaviorSubject.create<List<QrCode>>()
+    val createList=BehaviorSubject.create<List<QrCode>>()
 
-
-    fun getHistory(context: Context){
-        var response=AppDatabase.getInstance(context).qrHistoryDao().getQRHistoryList()
-        historyList.onNext(response)
-        Log.d("ScanHistory.LiveData.value",historyList.value!!.size.toString())
+    fun getAllScannedQrcode(){
+        var response= repository.getAllScannedQrCode()
+        scannedList.onNext(response)
+        Log.d("ScanHistory.LiveData.value",scannedList.value!!.size.toString())
+    }
+    fun getAllCreatedQrcode(){
+        var response= repository.getAllCreatedQrCode()
+        createList.onNext(response)
+        Log.d("ScanHistory.LiveData.value",createList.value!!.size.toString())
     }
 
-
-    fun deleteHistory(qrHistoryInfo: QRHistoryInfo,context: Context){
-       var filterdata= historyList.value.let {
-            it!!.filter { it.uid!=qrHistoryInfo.uid }
-        }
-
-        historyList.onNext(filterdata)
-        AppDatabase.getInstance(context).qrHistoryDao().delete(qrHistoryInfo)
-
+    fun deleteHistory(qrCode: QrCode){
+       repository.deleteQrCodeData(qrCode)
     }
+
 }

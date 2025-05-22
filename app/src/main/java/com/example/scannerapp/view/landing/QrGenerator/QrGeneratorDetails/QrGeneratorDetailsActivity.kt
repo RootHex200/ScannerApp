@@ -6,22 +6,28 @@ import android.util.Log
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.example.scannerapp.R
-import com.example.scannerapp.service.QrType
+import com.example.scannerapp.core.base.SimpleActivity
+import com.example.scannerapp.domain.model.QrCodeType
 import com.example.scannerapp.view.landing.QrGenerator.QrGeneratorOption.TextQrFragment
+import dagger.hilt.android.AndroidEntryPoint
 
-class QrGeneratorDetailsActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class QrGeneratorDetailsActivity : SimpleActivity() {
     @SuppressLint("MissingInflatedId")
     private lateinit var detailsFrameLayout:FrameLayout
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_qr_generator_details)
+
+    override fun getLayout(): Int {
+        return  R.layout.activity_qr_generator_details
+    }
+
+    override fun init() {
         var qrType=intent.getStringExtra("qrType")
         Log.d("QrGeneratorDetailsActivity.changeLayoutByValue",qrType!!.toString())
         changeLayoutByValue(value = qrType!!)
 
     }
 
-    fun changeLayoutByValue(value:String){
+    private  fun changeLayoutByValue(value:String){
         Log.d("QrGeneratorDetailsActivity.changeLayoutByValue",value)
         var fragment=TextQrFragment()
         val mBundle = Bundle()
@@ -30,9 +36,9 @@ class QrGeneratorDetailsActivity : AppCompatActivity() {
             value
         )
         fragment.setArguments(mBundle)
-        if(value==QrType.TEXT.name || value==QrType.PHONE.name ||
-            value==QrType.SMS.name || value==QrType.EMAIL.name ||
-            value==QrType.LOCATION.name || value==QrType.CONTACT.name){
+        if(value== QrCodeType.TEXT.name || value==QrCodeType.PHONE.name ||
+            value==QrCodeType.SMS.name || value==QrCodeType.EMAIL.name ||
+            value==QrCodeType.LOCATION.name || value==QrCodeType.CONTACT.name){
             supportFragmentManager.beginTransaction().replace(
                 R.id.detailsFrameLayout,
                 fragment
