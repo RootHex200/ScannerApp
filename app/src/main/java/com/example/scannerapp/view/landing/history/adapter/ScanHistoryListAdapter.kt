@@ -14,20 +14,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
 import com.example.scannerapp.domain.model.QrCode
 import com.example.scannerapp.view.details.DetailsActivity
-import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.example.scannerapp.view.landing.history.viewmodel.HistoryViewModel
 
 class ScanHistoryListAdapter(
     var historyList:MutableList<QrCode>,
     var context: Context?,
-    var viewModel: ScanHistoryViewModel
+    var viewModel: HistoryViewModel
 ): RecyclerView.Adapter<ScanHistoryListAdapter.ViewHolder>() {
 
     fun updateData(newList: List<QrCode>) {
         historyList.clear()  // Clear the old list
-        historyList.addAll(newList)  // Add new data
-        notifyDataSetChanged()  // Notify adapter of changes
+        historyList.addAll(newList)
+        notifyDataSetChanged()// Add new data
+
     }
 
     class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
@@ -56,7 +55,12 @@ class ScanHistoryListAdapter(
         holder.data.setText(historyList[position].content)
 
         holder.deleteBtn.setOnClickListener {
-//            viewModel.deleteHistory(historyList[position],context!!)
+            Log.d("historyButtonClicked","${position}${historyList[position].isScanned.toString()}")
+            if(historyList[position].isScanned){
+                viewModel.deleteScanQrCode(historyList[position])
+            }else{
+                viewModel.deleteCreatedQrCode(historyList[position])
+            }
         }
 
         holder.layout.setOnClickListener {

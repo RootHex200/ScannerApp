@@ -10,11 +10,11 @@ import com.example.scannerapp.R
 import com.example.scannerapp.core.base.BaseFragment
 import com.example.scannerapp.domain.model.QrCode
 import com.example.scannerapp.view.landing.history.adapter.ScanHistoryListAdapter
-import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
+import com.example.scannerapp.view.landing.history.viewmodel.HistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ScanHistory : BaseFragment<ScanHistoryViewModel>(ScanHistoryViewModel::class.java) {
+class ScanHistory : BaseFragment<HistoryViewModel>(HistoryViewModel::class.java) {
 
     private lateinit var  recyclerView:RecyclerView
     private lateinit var adapter: ScanHistoryListAdapter
@@ -52,9 +52,7 @@ class ScanHistory : BaseFragment<ScanHistoryViewModel>(ScanHistoryViewModel::cla
     private fun setLiveListener() {
         viewModel.scannedList.subscribe { value ->
 
-
-            var filterData=value
-            if(filterData.size<=0){
+            if(value.size<=0){
                 progressBar.visibility=View.GONE;
                 recyclerView.visibility=View.GONE;
                 emptyView.visibility=View.VISIBLE;
@@ -62,7 +60,7 @@ class ScanHistory : BaseFragment<ScanHistoryViewModel>(ScanHistoryViewModel::cla
                 progressBar.visibility=View.GONE
                 emptyView.visibility=View.GONE;
                 recyclerView.visibility=View.VISIBLE;
-                adapter.updateData(filterData)
+                adapter.updateData(value)
             }
 
         }

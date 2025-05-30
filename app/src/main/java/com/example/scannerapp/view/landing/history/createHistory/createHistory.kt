@@ -1,29 +1,22 @@
 package com.example.scannerapp.view.landing.history.createHistory
 
 import android.annotation.SuppressLint
-import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
 import com.example.scannerapp.core.base.BaseFragment
 import com.example.scannerapp.domain.model.QrCode
 import com.example.scannerapp.view.landing.history.adapter.ScanHistoryListAdapter
-import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
+import com.example.scannerapp.view.landing.history.viewmodel.HistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
 
 @AndroidEntryPoint
- class createHistory : BaseFragment<ScanHistoryViewModel>(ScanHistoryViewModel::class.java) {
+ class createHistory : BaseFragment<HistoryViewModel>(HistoryViewModel::class.java) {
     private lateinit var   recyclerView:RecyclerView
     private lateinit var adapter: ScanHistoryListAdapter
     private lateinit var progressBar:ProgressBar
@@ -58,8 +51,7 @@ import dagger.hilt.android.AndroidEntryPoint
     @SuppressLint("CheckResult")
     private fun setLiveListener() {
         viewModel.createList.subscribe {value->
-            var filterData=value
-            if(filterData.size<=0){
+            if(value.size<=0){
                 progressBar.visibility=View.GONE;
                 recyclerView.visibility=View.GONE;
                 emptyView.visibility=View.VISIBLE;
@@ -67,7 +59,7 @@ import dagger.hilt.android.AndroidEntryPoint
                 progressBar.visibility=View.GONE
                 emptyView.visibility=View.GONE;
                 recyclerView.visibility=View.VISIBLE;
-                adapter.updateData(filterData)
+                adapter.updateData(value)
             }
 
         }
