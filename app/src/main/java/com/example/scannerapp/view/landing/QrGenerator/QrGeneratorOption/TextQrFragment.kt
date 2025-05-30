@@ -51,7 +51,7 @@ class TextQrFragment() : BaseFragment<QrGeneratorViewModel>(QrGeneratorViewModel
 
         }
         savePhoto.setOnClickListener {
-            viewModel.saveQrCode(qrImageBitmap)
+            viewModel.saveQrCodeToGallery(qrImageBitmap)
         }
 
     }
