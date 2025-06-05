@@ -8,24 +8,34 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import com.example.scannerapp.R
+import com.example.scannerapp.core.base.BaseActivity
 import com.example.scannerapp.core.base.SimpleActivity
+import com.example.scannerapp.domain.model.QrCodeType
+import com.example.scannerapp.view.details.viewmodel.DetailsViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import java.security.Provider
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class DetailsActivity : SimpleActivity() {
+
+class DetailsActivity : BaseActivity<DetailsViewModel>(DetailsViewModel::class.java) {
 
     private lateinit var scanTextvalue:TextView
     private lateinit var shareBtn:LinearLayout
     private lateinit var copyBtn:LinearLayout
     private lateinit var datetimetext:TextView
-
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId", "SuspiciousIndentation")
 
     override fun getLayout(): Int {
         return R.layout.activity_details
+    }
+
+    override fun viewModel() {
+        super.viewModel()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -50,8 +60,8 @@ class DetailsActivity : SimpleActivity() {
         if(detailsType==null){
             qrImageViewLayout.visibility=LinearLayout.INVISIBLE
         }else{
-//            bitmap=  ServiceImpl().generateQR(inputValue = scannerValue.toString(), type = qrtype!!)
-//            qrImage.setImageBitmap(bitmap)
+            bitmap=  viewModel.getQrGenerated(scannerValue.toString(), QrCodeType.TEXT)
+          qrImage.setImageBitmap(bitmap)
 
         }
         title.setText(qrtype)
@@ -60,6 +70,7 @@ class DetailsActivity : SimpleActivity() {
         datetimetext=findViewById<TextView>(R.id.dateTimevalue)
         saveqrBtn.setOnClickListener {
 //            ServiceImpl().saveToGallery(context = this, bitmap = bitmap!!)
+            viewModel.saveToGallery(bitmap!!)
         }
         scanTextvalue=findViewById<TextView>(R.id.value)
 
