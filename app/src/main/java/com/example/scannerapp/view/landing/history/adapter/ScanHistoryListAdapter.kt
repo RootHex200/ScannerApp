@@ -12,24 +12,21 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
-import com.example.scannerapp.db.QRHistoryInfo
-import com.example.scannerapp.db.QRHistoryType
-import com.example.scannerapp.service.QrType
+import com.example.scannerapp.domain.model.QrCode
 import com.example.scannerapp.view.details.DetailsActivity
-import com.example.scannerapp.view.landing.history.viewmodel.ScanHistoryViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.example.scannerapp.view.landing.history.viewmodel.HistoryViewModel
 
 class ScanHistoryListAdapter(
-    var historyList:MutableList<QRHistoryInfo>,
+    var historyList:MutableList<QrCode>,
     var context: Context?,
-    var viewModel: ScanHistoryViewModel
+    var viewModel: HistoryViewModel
 ): RecyclerView.Adapter<ScanHistoryListAdapter.ViewHolder>() {
 
-    fun updateData(newList: List<QRHistoryInfo>) {
+    fun updateData(newList: List<QrCode>) {
         historyList.clear()  // Clear the old list
-        historyList.addAll(newList)  // Add new data
-        notifyDataSetChanged()  // Notify adapter of changes
+        historyList.addAll(newList)
+        notifyDataSetChanged()// Add new data
+
     }
 
     class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
@@ -54,19 +51,24 @@ class ScanHistoryListAdapter(
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.text.setText(historyList[position].type)
-        holder.data.setText(historyList[position].value)
+        holder.text.setText(historyList[position].type.toString())
+        holder.data.setText(historyList[position].content)
 
         holder.deleteBtn.setOnClickListener {
-            viewModel.deleteHistory(historyList[position],context!!)
+            Log.d("historyButtonClicked","${position}${historyList[position].isScanned.toString()}")
+            if(historyList[position].isScanned){
+                viewModel.deleteScanQrCode(historyList[position])
+            }else{
+                viewModel.deleteCreatedQrCode(historyList[position])
+            }
         }
 
         holder.layout.setOnClickListener {
             var intent=Intent(context,DetailsActivity::class.java)
-            intent.putExtra("value",historyList[position].value)
-            intent.putExtra("datetime",historyList[position].createAt)
+            intent.putExtra("value",historyList[position].content)
+            intent.putExtra("datetime",historyList[position].createdAt)
             intent.putExtra("type",historyList[position].type)
-            if(historyList[position].historyType.toString()==QRHistoryType.CREATE_HISTORY.toString()){
+            if(historyList[position].isScanned==false){
                 intent.putExtra("detailsType","createHistory")
             }
             context!!.startActivity(intent)

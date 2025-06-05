@@ -9,58 +9,32 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scannerapp.R
-import com.example.scannerapp.service.QrType
+import com.example.scannerapp.core.base.SimpleFragment
+import com.example.scannerapp.domain.model.QrCodeType
 import com.example.scannerapp.view.landing.QrGenerator.adapter.QrGeneratorOptionAdapter
 import com.example.scannerapp.view.landing.QrGenerator.model.QrOptionItem
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-class QRgenerator : Fragment() {
-
-    private var param1: String? = null
-    private var param2: String? = null
+class QRgenerator : SimpleFragment() {
 
     var tmplist= arrayListOf(
-        QrOptionItem(title = "Text", image = R.drawable.ic_text, qrOptionType = QrType.TEXT),
-        QrOptionItem(title = "Phone", image = R.drawable.ic_phone, qrOptionType = QrType.PHONE),
-        QrOptionItem(title = "SMS", image = R.drawable.ic_sms, qrOptionType = QrType.SMS),
-        QrOptionItem(title = "Email", image = R.drawable.ic_email, qrOptionType = QrType.EMAIL),
-        QrOptionItem(title = "Contact", image = R.drawable.ic_contact, qrOptionType = QrType.CONTACT),
+        QrOptionItem(title = "Text", image = R.drawable.ic_text, qrOptionType = QrCodeType.TEXT),
+        QrOptionItem(title = "Phone", image = R.drawable.ic_phone, qrOptionType = QrCodeType.PHONE),
+        QrOptionItem(title = "SMS", image = R.drawable.ic_sms, qrOptionType = QrCodeType.SMS),
+        QrOptionItem(title = "Email", image = R.drawable.ic_email, qrOptionType = QrCodeType.EMAIL),
+        QrOptionItem(title = "Contact", image = R.drawable.ic_contact, qrOptionType = QrCodeType.CONTACT),
     )
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    override fun getLayout(): Int {
+        return R.layout.fragment_q_rgenerator
     }
 
     @SuppressLint("MissingInflatedId")
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view=inflater.inflate(R.layout.fragment_q_rgenerator, container, false)
-
+    override fun init() {
 
         //initialize ui
-        var recyclerView=view.findViewById<RecyclerView>(R.id.generatedOptionList)
+        val recyclerView=rootView.findViewById<RecyclerView>(R.id.generatedOptionList)
         recyclerView.layoutManager = GridLayoutManager(context,3)
         recyclerView.adapter= QrGeneratorOptionAdapter(tmplist)
-        return view
     }
 
-    companion object {
-
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            QRgenerator().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
 }

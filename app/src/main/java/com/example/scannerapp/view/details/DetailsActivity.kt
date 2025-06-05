@@ -4,41 +4,48 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
-import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.scannerapp.R
-import com.example.scannerapp.db.AppDatabase
-import com.example.scannerapp.db.QRHistoryType
-import com.example.scannerapp.service.QRGeneratorService
-import com.example.scannerapp.service.QrType
-import org.w3c.dom.Text
-import java.time.LocalDate
+import com.example.scannerapp.core.base.BaseActivity
+import com.example.scannerapp.core.base.SimpleActivity
+import com.example.scannerapp.domain.model.QrCodeType
+import com.example.scannerapp.view.details.viewmodel.DetailsViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import java.security.Provider
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
-class DetailsActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class DetailsActivity : BaseActivity<DetailsViewModel>(DetailsViewModel::class.java) {
+
     private lateinit var scanTextvalue:TextView
     private lateinit var shareBtn:LinearLayout
     private lateinit var copyBtn:LinearLayout
     private lateinit var datetimetext:TextView
-
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId", "SuspiciousIndentation")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details)
+
+    override fun getLayout(): Int {
+        return R.layout.activity_details
+    }
+
+    override fun viewModel() {
+        super.viewModel()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun init() {
         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")
         val currentdateTime=LocalDateTime.now()
         val scannerValue=intent.getStringExtra("value")
+        Log.d("value",scannerValue.toString())
+
+
         var title=findViewById<TextView>(R.id.qrTypeTitle)
         var qrtype=intent.getStringExtra("type")
         val scannerDateTime=intent.getStringExtra("datetime")
@@ -47,12 +54,14 @@ class DetailsActivity : AppCompatActivity() {
         var saveqrBtn=findViewById<LinearLayout>(R.id.saveToGallery)
         var qrImage=findViewById<ImageView>(R.id.qrImageview)
         var qrImageViewLayout=findViewById<LinearLayout>(R.id.qrImageViewLayout)
+        copyBtn=findViewById<LinearLayout>(R.id.copy)
+        shareBtn=findViewById<LinearLayout>(R.id.share)
         var bitmap:Bitmap?=null
         if(detailsType==null){
             qrImageViewLayout.visibility=LinearLayout.INVISIBLE
         }else{
-            bitmap=  QRGeneratorService().generateQR(inputValue = scannerValue.toString(), type = qrtype!!)
-            qrImage.setImageBitmap(bitmap)
+            bitmap=  viewModel.getQrGenerated(scannerValue.toString(), QrCodeType.TEXT)
+          qrImage.setImageBitmap(bitmap)
 
         }
         title.setText(qrtype)
@@ -60,7 +69,8 @@ class DetailsActivity : AppCompatActivity() {
         copyBtn=findViewById<LinearLayout>(R.id.copy)
         datetimetext=findViewById<TextView>(R.id.dateTimevalue)
         saveqrBtn.setOnClickListener {
-            QRGeneratorService().saveToGallery(context = this, bitmap = bitmap!!)
+//            ServiceImpl().saveToGallery(context = this, bitmap = bitmap!!)
+            viewModel.saveToGallery(bitmap!!)
         }
         scanTextvalue=findViewById<TextView>(R.id.value)
 
@@ -76,8 +86,29 @@ class DetailsActivity : AppCompatActivity() {
 
         scanTextvalue.setText(scannerValue)
 
+        copyText(scannerValue!!)
+        share()
 
 
+    }
 
+    private fun copyText(value:String){
+        copyBtn.setOnClickListener {
+            val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clipData = android.content.ClipData.newPlainText("text", value)
+            clipboardManager.setPrimaryClip(clipData)
+        }
+
+    }
+
+    private fun share(){
+        shareBtn.setOnClickListener {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, scanTextvalue.text)
+                type = "text/plain"
+            }
+            startActivity(sendIntent)
+        }
     }
 }

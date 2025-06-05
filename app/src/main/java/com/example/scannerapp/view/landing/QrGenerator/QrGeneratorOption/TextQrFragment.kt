@@ -2,108 +2,57 @@ package com.example.scannerapp.view.landing.QrGenerator.QrGeneratorOption
 
 import android.graphics.Bitmap
 import android.os.Build
-import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
 import com.example.scannerapp.R
-import com.example.scannerapp.db.AppDatabase
-import com.example.scannerapp.db.QRHistoryInfo
-import com.example.scannerapp.db.QRHistoryType
-import com.example.scannerapp.service.QRGeneratorService
-import com.example.scannerapp.service.QrType
-import org.w3c.dom.Text
-import java.time.LocalDateTime
+import com.example.scannerapp.core.base.BaseFragment
+import com.example.scannerapp.domain.model.QrCodeType
+import com.example.scannerapp.view.landing.QrGenerator.viewmodel.QrGeneratorViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@AndroidEntryPoint
+class TextQrFragment() : BaseFragment<QrGeneratorViewModel>(QrGeneratorViewModel::class.java) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [TextQrFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class TextQrFragment() : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
     private lateinit var qrImageBitmap:Bitmap
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
+    override fun getLayout(): Int {
+        return R.layout.fragment_text_qr
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun init() {
 
+        // catch value from bundle
         val bundle = arguments
         val qrtype = bundle!!.getString("value")
-        // Inflate the layout for this fragment
-        var view:View=inflater.inflate(R.layout.fragment_text_qr, container, false);
 
-        var textValue=view.findViewById<EditText>(R.id.textInput);
-        var generateQrButton=view.findViewById<LinearLayout>(R.id.generateQrButton);
-        var qrImageview=view.findViewById<ImageView>(R.id.qrImageview);
-        var savePhoto=view.findViewById<LinearLayout>(R.id.saveToGallery);
-        var pageTitles=view.findViewById<TextView>(R.id.pageTitle);
-        var inputName=view.findViewById<TextView>(R.id.inputName);
+        var textValue=rootView.findViewById<EditText>(R.id.textInput);
+        var generateQrButton=rootView.findViewById<LinearLayout>(R.id.generateQrButton);
+        var qrImageview=rootView.findViewById<ImageView>(R.id.qrImageview);
+        var savePhoto=rootView.findViewById<LinearLayout>(R.id.saveToGallery);
+        var pageTitles=rootView.findViewById<TextView>(R.id.pageTitle);
+        var inputName=rootView.findViewById<TextView>(R.id.inputName);
         savePhoto.visibility=View.GONE
         pageTitles.setText(qrtype)
         inputName.setText("${qrtype?.lowercase()?.capitalize()} Input")
         generateQrButton.setOnClickListener {
-            val getBitmap=QRGeneratorService().generateQR(inputValue =textValue.text.trim().toString() , type = qrtype!!)
+            Log.d("Message","Click is here")
+            val getBitmap=viewModel.generateQrCode(textValue.text.trim().toString() , QrCodeType.valueOf(qrtype!!))
             qrImageBitmap=getBitmap;
             qrImageview.setImageBitmap(getBitmap);
             savePhoto.visibility=View.VISIBLE
 
 
-            //store in db
-            AppDatabase.getInstance(container!!.context).qrHistoryDao().insertQRInfo(
-                QRHistoryInfo(
-                type = qrtype,
-                value = textValue.text.trim().toString(),
-                createAt = LocalDateTime.now().toString(),
-                historyType = QRHistoryType.CREATE_HISTORY
-            ))
+
         }
         savePhoto.setOnClickListener {
-            QRGeneratorService().saveToGallery(container!!.context,qrImageBitmap)
+            viewModel.saveQrCodeToGallery(qrImageBitmap)
         }
-        return view;
 
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment wifi_qr.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TextQrFragment( ).apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

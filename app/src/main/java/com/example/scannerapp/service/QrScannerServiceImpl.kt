@@ -1,94 +1,44 @@
 package com.example.scannerapp.service
 
-import android.R.attr.bitmap
-import android.content.ContentValues
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.Picture
 import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
+import androidx.annotation.RequiresApi
+import com.example.scannerapp.core.common.RequestCompleteListener
+import com.example.scannerapp.core.common.model.QrScanValueModel
+import com.example.scannerapp.domain.model.QrCode
+import com.example.scannerapp.domain.model.QrCodeType
+import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
+import com.google.mlkit.vision.common.InputImage
+import java.time.LocalDateTime
 
+class QrScannerServiceImpl:QrScannerService {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val localTime:String=LocalDateTime.now().toString()
 
-class QRGeneratorService:QrServiceRepository {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun scanQrCodeFromImage(image: InputImage,callback: RequestCompleteListener<QrCode>) {
 
-    private fun getQrType(type:String):String{
-        if (type==QrType.SMS.toString()){
-            return QRGContents.Type.SMS;
-        }
-        if(type==QrType.EMAIL.toString()){
-            return QRGContents.Type.EMAIL;
-        }
-        if(type==QrType.CONTACT.toString()){
-            return QRGContents.Type.CONTACT;
-        }
-        if(type==QrType.PHONE.toString()){
-            return QRGContents.Type.PHONE;
-        }
-        if(type==QrType.LOCATION.toString()){
-            return QRGContents.Type.LOCATION;
-        }
+        val scanner = BarcodeScanning.getClient()
 
-        return QRGContents.Type.TEXT;
-    }
-
-
-    override fun generateQR(inputValue:String,type:String):Bitmap{
-        val qrType=getQrType(type)
-        Log.d("detailsType",qrType)
-        val qrgEncoder = QRGEncoder(inputValue, null, qrType,200)
-        try {
-            // Getting QR-Code as Bitmap
-            var bitmap = qrgEncoder.bitmap
-            // Setting Bitmap to ImageView
-            return bitmap;
-        } catch (e:Exception) {
-            throw Exception("Generate QR image error")
-        }
-    }
-
-
-    override fun saveToGallery(context: Context, bitmap: Bitmap) {
-        val filename = "${System.currentTimeMillis()}.png"
-        val write: (OutputStream) -> Boolean = {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_DCIM}/Picture")
-            }
-
-            context.contentResolver.let {
-                it.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)?.let { uri ->
-                    it.openOutputStream(uri)?.let(write)
+        scanner.process(image)
+            .addOnSuccessListener { barcodes ->
+                if (barcodes.isNotEmpty()) {
+                    val qrCode = formatBarcode(barcodes[0])
+                    callback.onSuccess(qrCode)
+                } else {
+                    callback.onFailure("No QR code found in the image")
                 }
             }
-        } else {
-            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + File.separator + "Picture"
-            val file = File(imagesDir)
-            if (!file.exists()) {
-                file.mkdir()
+            .addOnFailureListener { e ->
+                callback.onFailure(e.toString())
             }
-            val image = File(imagesDir, filename)
-            write(FileOutputStream(image))
-        }
     }
 
 
-
-    //QR data formator service
-    override fun formatBarcode(barcode: Barcode): QRData {
+        //QR data formator service
+        @RequiresApi(Build.VERSION_CODES.O)
+       private fun formatBarcode(barcode: Barcode): QrCode {
         return when (barcode.valueType) {
             Barcode.TYPE_WIFI -> formatWifi(barcode)
             Barcode.TYPE_URL -> formatUrl(barcode)
@@ -103,14 +53,15 @@ class QRGeneratorService:QrServiceRepository {
         }
     }
 
-    private fun formatWifi(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatWifi(barcode: Barcode): QrCode {
         val wifi = barcode.wifi ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             appendLine("Network: ${wifi.ssid}")
             appendLine("Password: ${wifi.password}")
             appendLine("Encryption Type: ${getEncryptionType(wifi.encryptionType)}")
         }
-        return QRData("WIFI", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.WIFI, content =  formattedContent, createdAt = localTime)
     }
 
     private fun getEncryptionType(type: Int): String {
@@ -122,7 +73,8 @@ class QRGeneratorService:QrServiceRepository {
         }
     }
 
-    private fun formatUrl(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatUrl(barcode: Barcode): QrCode {
         val url = barcode.url ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             appendLine("URL: ${url.url}")
@@ -130,10 +82,11 @@ class QRGeneratorService:QrServiceRepository {
                 appendLine("Title: ${url.title}")
             }
         }
-        return QRData("URL", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.URL, content =  formattedContent, createdAt = localTime)
     }
 
-    private fun formatEmail(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatEmail(barcode: Barcode): QrCode {
         val email = barcode.email ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             appendLine("Email: ${email.address}")
@@ -144,10 +97,11 @@ class QRGeneratorService:QrServiceRepository {
                 appendLine("Body: ${email.body}")
             }
         }
-        return QRData("EMAIL", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.valueOf("EMAIL"), content =  formattedContent, createdAt = localTime)
     }
 
-    private fun formatContact(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatContact(barcode: Barcode): QrCode {
         val contact = barcode.contactInfo ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             if (contact.name != null) {
@@ -191,30 +145,34 @@ class QRGeneratorService:QrServiceRepository {
                 }
             }
         }
-        return QRData("CONTACT", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.CONTACT,content= formattedContent, createdAt = localTime)
     }
 
-    private fun formatSms(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatSms(barcode: Barcode): QrCode {
         val sms = barcode.sms ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             appendLine("Phone Number: ${sms.phoneNumber}")
             appendLine("Message: ${sms.message}")
         }
-        return QRData("SMS", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.SMS, content =  formattedContent, createdAt = localTime)
     }
 
-    private fun formatPhone(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatPhone(barcode: Barcode): QrCode {
         val phone = barcode.phone ?: return formatPlainText(barcode)
-        return QRData("PHONE", "Phone Number: ${phone.number}", barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.PHONE, content = "Phone Number: ${phone.number}", createdAt = localTime)
     }
 
-    private fun formatGeo(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatGeo(barcode: Barcode): QrCode {
         val geo = barcode.geoPoint ?: return formatPlainText(barcode)
         val formattedContent = "Location: ${geo.lat}, ${geo.lng}"
-        return QRData("GEO", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.GEO, content =  formattedContent, createdAt = localTime)
     }
 
-    private fun formatCalendarEvent(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatCalendarEvent(barcode: Barcode): QrCode {
         val event = barcode.calendarEvent ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             appendLine("Summary: ${event.summary}")
@@ -227,10 +185,11 @@ class QRGeneratorService:QrServiceRepository {
                 appendLine("Status: ${event.status}")
             }
         }
-        return QRData("CALENDAR", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.CALENDAR,content =formattedContent, createdAt = localTime)
     }
 
-    private fun formatDriverLicense(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatDriverLicense(barcode: Barcode): QrCode {
         val license = barcode.driverLicense ?: return formatPlainText(barcode)
         val formattedContent = buildString {
             appendLine("Document Type: Driver's License")
@@ -243,10 +202,11 @@ class QRGeneratorService:QrServiceRepository {
             appendLine("Expiry Date: ${license.expiryDate}")
             appendLine("Issuing Country: ${license.issuingCountry}")
         }
-        return QRData("DRIVER_LICENSE", formattedContent, barcode.rawValue ?: "")
+        return QrCode(type = QrCodeType.DRIVER_LICENSE, content =  formattedContent, createdAt = localTime)
     }
 
-    private fun formatPlainText(barcode: Barcode): QRData {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatPlainText(barcode: Barcode): QrCode {
         // Try to determine if this is a specific format not detected by the scanner
         val rawValue = barcode.rawValue ?: ""
 
@@ -254,20 +214,21 @@ class QRGeneratorService:QrServiceRepository {
         return when {
             // Basic Bitcoin address detection
             rawValue.matches(Regex("^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$")) -> {
-                QRData("BITCOIN", "Bitcoin Address: $rawValue", rawValue)
+                QrCode(type = QrCodeType.BITCOIN, content =  "Bitcoin Address: $rawValue", createdAt = localTime)
             }
             // Ethereum address detection
             rawValue.matches(Regex("^0x[a-fA-F0-9]{40}$")) -> {
-                QRData("ETHEREUM", "Ethereum Address: $rawValue", rawValue)
+                QrCode(type = QrCodeType.ETHEREUM, content =  "Ethereum Address: $rawValue", createdAt = localTime)
             }
             // Check if it's a URL even if not detected as such
             rawValue.startsWith("http://") || rawValue.startsWith("https://") -> {
-                QRData("URL", "URL: $rawValue", rawValue)
+                QrCode(type = QrCodeType.URL, content =  "URL: $rawValue", createdAt = localTime)
             }
             // Default plain text
             else -> {
-                QRData("TEXT", rawValue, rawValue)
+                QrCode(type = QrCodeType.TEXT, content = rawValue, createdAt = localTime)
             }
         }
     }
+
 }

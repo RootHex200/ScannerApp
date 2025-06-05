@@ -12,81 +12,44 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.example.scannerapp.R
 import com.example.scannerapp.R.color.secondaryColor2
+import com.example.scannerapp.core.base.BaseFragment
+import com.example.scannerapp.core.base.BaseViewModel
+import com.example.scannerapp.core.base.SimpleFragment
 import com.example.scannerapp.view.landing.history.createHistory.createHistory
 import com.example.scannerapp.view.landing.history.scanHistory.ScanHistory
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@AndroidEntryPoint
+class QRhistory : SimpleFragment() {
+    
 
-/**
- * A simple [Fragment] subclass.
- * Use the [QRhistory.newInstance] factory method to
- * create an instance of this fragment.
- */
-class QRhistory : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    override fun getLayout(): Int {
+        return R.layout.fragment_q_rhistory
     }
 
-    @SuppressLint("ResourceAsColor")
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun init() {
         parentFragmentManager.beginTransaction().replace(
             R.id.qrHistoryframlayout,ScanHistory()
         ).commit()
-        // Inflate the layout for this fragment
-        var view=inflater.inflate(R.layout.fragment_q_rhistory, container, false)
 
-        var scanHistory=view.findViewById<LinearLayout>(R.id.scanHistoryBtn)
-        var createHistory=view.findViewById<LinearLayout>(R.id.createHistoryBtn)
-       // var scanFragment=view.findViewById<FrameLayout>(R.id.qrHistoryframlayout)
+
+        val scanHistory=rootView.findViewById<LinearLayout>(R.id.scanHistoryBtn)
+        val createHistory=rootView.findViewById<LinearLayout>(R.id.createHistoryBtn)
+
         scanHistory.setOnClickListener {
             parentFragmentManager.beginTransaction().replace(
                 R.id.qrHistoryframlayout,ScanHistory()
             ).commit()
             scanHistory.setBackgroundResource(R.drawable.linear_color)
-            createHistory.setBackgroundColor(ContextCompat.getColor(container!!.context,R.color.secondaryColor2))
+            createHistory.setBackgroundColor(ContextCompat.getColor(rootView.context,R.color.secondaryColor2))
         }
         createHistory.setOnClickListener {
             parentFragmentManager.beginTransaction().replace(
                 R.id.qrHistoryframlayout,createHistory()
             ).commit()
             createHistory.setBackgroundResource(R.drawable.linear_color)
-            scanHistory.setBackgroundColor(ContextCompat.getColor(container!!.context,R.color.secondaryColor2))
+            scanHistory.setBackgroundColor(ContextCompat.getColor(rootView.context!!,R.color.secondaryColor2))
         }
-
-        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment QRhistory.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            QRhistory().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
 }

@@ -13,15 +13,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.scannerapp.R
+import com.example.scannerapp.core.base.SimpleActivity
 import com.example.scannerapp.view.landing.BottomNavigation
+import dagger.hilt.android.AndroidEntryPoint
 
-class OnboardingActivity : AppCompatActivity() {
+class OnboardingActivity : SimpleActivity() {
     private lateinit var getStartButton:ImageButton
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_onboarding)
+    override fun getLayout(): Int {
+        return R.layout.activity_onboarding
+    }
 
+    override fun init() {
         getStartButton=findViewById<ImageButton>(R.id.btn)
         getStartButton.setOnClickListener {
             var intent=Intent(this,BottomNavigation::class.java)
