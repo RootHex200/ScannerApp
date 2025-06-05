@@ -68,9 +68,9 @@ class ScanHistoryListAdapter(
             intent.putExtra("value",historyList[position].content)
             intent.putExtra("datetime",historyList[position].createdAt)
             intent.putExtra("type",historyList[position].type)
-//            if(historyList[position].historyType.toString()== QRHistoryType.CREATE_HISTORY.toString()){
-//                intent.putExtra("detailsType","createHistory")
-//            }
+            if(historyList[position].isScanned==false){
+                intent.putExtra("detailsType","createHistory")
+            }
             context!!.startActivity(intent)
 
         }

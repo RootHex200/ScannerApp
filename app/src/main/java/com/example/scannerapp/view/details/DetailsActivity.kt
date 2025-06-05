@@ -20,7 +20,7 @@ import java.security.Provider
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-
+@AndroidEntryPoint
 class DetailsActivity : BaseActivity<DetailsViewModel>(DetailsViewModel::class.java) {
 
     private lateinit var scanTextvalue:TextView

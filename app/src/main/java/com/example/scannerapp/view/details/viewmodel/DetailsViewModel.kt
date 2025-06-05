@@ -7,6 +7,7 @@ import com.example.scannerapp.service.QrGeneratorServices
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 
+@HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val qrGeneratorService: QrGeneratorServices,
 ):BaseViewModel() {
